@@ -7,25 +7,34 @@ class User:
         self.email = email
         self.password = password
 
-    def validate(self):
-        required_fields = ["id", "name", "email", "password"]
+    def __dict__(self):
+        return {
+            "id": self.id,
+            "name": self.name,
+            "email": self.email,
+            "password": self.password,
+        }
 
-        for field in required_fields:
-            if not hasattr(self, field):
-                return False
 
-        return True
+def get_user_by_id(user_id):
+    return next((user for user in User.users if user.id == user_id), None)
 
-    def save(self):
-        User.users.append(self)
 
-    def delete(self):
-        User.users = [user for user in User.users if user.id != self.id]
+def add_user(user):
+    new_user = User(**user.dict())
+    User.users.append(new_user)
+    return new_user
 
-    @classmethod
-    def find_by_id(cls, user_id):
-        return next((user for user in cls.users if user.id == user_id), None)
 
-    @staticmethod
-    def get_all():
-        return User.users
+def update_user(user_id, updated_user):
+    user = get_user_by_id(user_id)
+    user.name = updated_user.name
+    user.email = updated_user.email
+    user.password = updated_user.password
+    return user
+
+
+def delete_user(user_id):
+    user = get_user_by_id(user_id)
+    User.users = [u for u in User.users if u.id != user_id]
+    return user
